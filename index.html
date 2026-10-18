@@ -25,6 +25,13 @@
             text-align: center; color: #2c3e50; border-bottom: 2px solid #e9ecef; 
             padding-bottom: 15px; margin-top: 0; font-size: 24px;
         }
+        
+        /* כותרת מיוחדת לתאריך ב-PDF (מוסתרת כברירת מחדל) */
+        #print-date {
+            display: none; text-align: center; color: #495057; font-size: 18px;
+            margin-top: -10px; margin-bottom: 20px;
+        }
+
         .control-panel {
             display: flex; justify-content: space-between; align-items: center;
             margin-bottom: 20px; flex-wrap: wrap; gap: 15px; background-color: #f8f9fa;
@@ -52,9 +59,14 @@
             color: #333; font-family: inherit; font-size: 15px; outline: none; padding-bottom: 3px;
         }
         
-        /* עיצוב הצ'קבוקסים */
         input[type="checkbox"] { transform: scale(1.4); cursor: pointer; accent-color: #0d6efd; }
         
+        /* אזור ספירת הנוכחות */
+        .summary-box {
+            background-color: #e8f4f8; border: 1px solid #b6d4fe; border-radius: 8px;
+            padding: 15px; margin-top: 20px; text-align: center; font-size: 18px; font-weight: bold; color: #084298;
+        }
+
         /* 📱 התאמות לסלולר */
         @media (max-width: 600px) {
             body { padding: 10px; }
@@ -69,188 +81,206 @@
 </head>
 <body>
 
-    <!-- מזהה לקונטיינר כדי שהסקריפט יידע מה להפוך ל-PDF -->
     <div class="container" id="report-container">
-        <h1>קבוצת משלחת - דוח נוכחות</h1>
+        <h1 id="main-title">קבוצת משלחת - דוח נוכחות</h1>
+        <!-- תאריך שיופיע רק בקובץ ה-PDF -->
+        <h2 id="print-date"></h2>
         
         <div class="control-panel" id="controls">
             <div class="date-picker-container">
                 <label for="meetingDate">תאריך המפגש:</label>
                 <input type="date" id="meetingDate" class="date-picker">
             </div>
-            <!-- הכפתור מפעיל את פונקציית ההורדה הישירה -->
-            <button class="print-button" onclick="downloadPDF()">⬇️ שמור כקובץ PDF</button>
+            <button class="print-button" onclick="downloadPDF()">⬇️ שמור כקובץ PDF לדרייב</button>
         </div>
 
         <table id="attendanceTable">
             <thead>
                 <tr>
-                    <th style="width: 12%; text-align: center;">נוכח/ת</th>
-                    <th style="width: 38%;">שם התלמיד.ה</th>
+                    <th style="width: 15%; text-align: center;">נוכח/ת</th>
+                    <th style="width: 35%;">שם התלמיד.ה</th>
                     <th style="width: 50%;">הערות</th>
                 </tr>
             </thead>
             <tbody>
-                <!-- תלמיד 1 -->
+                <!-- הכנסנו רווח קשיח כפול (&nbsp;&nbsp;) בין השמות כדי שזה לא יתחבר ב-PDF -->
                 <tr>
-                    <td style="text-align: center;"><input type="checkbox" id="student_1"></td>
-                    <td><label for="student_1" style="cursor: pointer; display: block; font-weight: 500;">מיכל אייזנברג</label></td>
+                    <td style="text-align: center;"><input type="checkbox" id="student_1" class="attendance-cb"></td>
+                    <td><label for="student_1" style="cursor: pointer; display: block; font-weight: 500;">מיכל&nbsp;&nbsp;אייזנברג</label></td>
                     <td><input type="text" class="note-input"></td>
                 </tr>
-                <!-- תלמיד 2 -->
                 <tr>
-                    <td style="text-align: center;"><input type="checkbox" id="student_2"></td>
-                    <td><label for="student_2" style="cursor: pointer; display: block; font-weight: 500;">רונה בר יעקב</label></td>
+                    <td style="text-align: center;"><input type="checkbox" id="student_2" class="attendance-cb"></td>
+                    <td><label for="student_2" style="cursor: pointer; display: block; font-weight: 500;">רונה&nbsp;&nbsp;בר יעקב</label></td>
                     <td><input type="text" class="note-input"></td>
                 </tr>
-                <!-- תלמיד 3 -->
                 <tr>
-                    <td style="text-align: center;"><input type="checkbox" id="student_3"></td>
-                    <td><label for="student_3" style="cursor: pointer; display: block; font-weight: 500;">שחר גלייך</label></td>
+                    <td style="text-align: center;"><input type="checkbox" id="student_3" class="attendance-cb"></td>
+                    <td><label for="student_3" style="cursor: pointer; display: block; font-weight: 500;">שחר&nbsp;&nbsp;גלייך</label></td>
                     <td><input type="text" class="note-input"></td>
                 </tr>
-                <!-- תלמיד 4 -->
                 <tr>
-                    <td style="text-align: center;"><input type="checkbox" id="student_4"></td>
-                    <td><label for="student_4" style="cursor: pointer; display: block; font-weight: 500;">רוני דריימן</label></td>
+                    <td style="text-align: center;"><input type="checkbox" id="student_4" class="attendance-cb"></td>
+                    <td><label for="student_4" style="cursor: pointer; display: block; font-weight: 500;">רוני&nbsp;&nbsp;דריימן</label></td>
                     <td><input type="text" class="note-input"></td>
                 </tr>
-                <!-- תלמיד 5 -->
                 <tr>
-                    <td style="text-align: center;"><input type="checkbox" id="student_5"></td>
-                    <td><label for="student_5" style="cursor: pointer; display: block; font-weight: 500;">רותם הר לב</label></td>
+                    <td style="text-align: center;"><input type="checkbox" id="student_5" class="attendance-cb"></td>
+                    <td><label for="student_5" style="cursor: pointer; display: block; font-weight: 500;">רותם&nbsp;&nbsp;הר לב</label></td>
                     <td><input type="text" class="note-input"></td>
                 </tr>
-                <!-- תלמיד 6 -->
                 <tr>
-                    <td style="text-align: center;"><input type="checkbox" id="student_6"></td>
-                    <td><label for="student_6" style="cursor: pointer; display: block; font-weight: 500;">ליאל טדלה</label></td>
+                    <td style="text-align: center;"><input type="checkbox" id="student_6" class="attendance-cb"></td>
+                    <td><label for="student_6" style="cursor: pointer; display: block; font-weight: 500;">ליאל&nbsp;&nbsp;טדלה</label></td>
                     <td><input type="text" class="note-input"></td>
                 </tr>
-                <!-- תלמיד 7 -->
                 <tr>
-                    <td style="text-align: center;"><input type="checkbox" id="student_7"></td>
-                    <td><label for="student_7" style="cursor: pointer; display: block; font-weight: 500;">שי טבת</label></td>
+                    <td style="text-align: center;"><input type="checkbox" id="student_7" class="attendance-cb"></td>
+                    <td><label for="student_7" style="cursor: pointer; display: block; font-weight: 500;">שי&nbsp;&nbsp;טבת</label></td>
                     <td><input type="text" class="note-input"></td>
                 </tr>
-                <!-- תלמיד 8 -->
                 <tr>
-                    <td style="text-align: center;"><input type="checkbox" id="student_8"></td>
-                    <td><label for="student_8" style="cursor: pointer; display: block; font-weight: 500;">גליה כהן</label></td>
+                    <td style="text-align: center;"><input type="checkbox" id="student_8" class="attendance-cb"></td>
+                    <td><label for="student_8" style="cursor: pointer; display: block; font-weight: 500;">גליה&nbsp;&nbsp;כהן</label></td>
                     <td><input type="text" class="note-input"></td>
                 </tr>
-                <!-- תלמיד 9 -->
                 <tr>
-                    <td style="text-align: center;"><input type="checkbox" id="student_9"></td>
-                    <td><label for="student_9" style="cursor: pointer; display: block; font-weight: 500;">רוני כלדיאן</label></td>
+                    <td style="text-align: center;"><input type="checkbox" id="student_9" class="attendance-cb"></td>
+                    <td><label for="student_9" style="cursor: pointer; display: block; font-weight: 500;">רוני&nbsp;&nbsp;כלדיאן</label></td>
                     <td><input type="text" class="note-input"></td>
                 </tr>
-                <!-- תלמיד 10 -->
                 <tr>
-                    <td style="text-align: center;"><input type="checkbox" id="student_10"></td>
-                    <td><label for="student_10" style="cursor: pointer; display: block; font-weight: 500;">נועה ליבנה</label></td>
+                    <td style="text-align: center;"><input type="checkbox" id="student_10" class="attendance-cb"></td>
+                    <td><label for="student_10" style="cursor: pointer; display: block; font-weight: 500;">נועה&nbsp;&nbsp;ליבנה</label></td>
                     <td><input type="text" class="note-input"></td>
                 </tr>
-                <!-- תלמיד 11 -->
                 <tr>
-                    <td style="text-align: center;"><input type="checkbox" id="student_11"></td>
-                    <td><label for="student_11" style="cursor: pointer; display: block; font-weight: 500;">אביגיל מלול</label></td>
+                    <td style="text-align: center;"><input type="checkbox" id="student_11" class="attendance-cb"></td>
+                    <td><label for="student_11" style="cursor: pointer; display: block; font-weight: 500;">אביגיל&nbsp;&nbsp;מלול</label></td>
                     <td><input type="text" class="note-input"></td>
                 </tr>
-                <!-- תלמיד 12 -->
                 <tr>
-                    <td style="text-align: center;"><input type="checkbox" id="student_12"></td>
-                    <td><label for="student_12" style="cursor: pointer; display: block; font-weight: 500;">מעיין נין נון</label></td>
+                    <td style="text-align: center;"><input type="checkbox" id="student_12" class="attendance-cb"></td>
+                    <td><label for="student_12" style="cursor: pointer; display: block; font-weight: 500;">מעיין&nbsp;&nbsp;נין נון</label></td>
                     <td><input type="text" class="note-input"></td>
                 </tr>
-                <!-- תלמיד 13 -->
                 <tr>
-                    <td style="text-align: center;"><input type="checkbox" id="student_13"></td>
-                    <td><label for="student_13" style="cursor: pointer; display: block; font-weight: 500;">מאי קסטל</label></td>
+                    <td style="text-align: center;"><input type="checkbox" id="student_13" class="attendance-cb"></td>
+                    <td><label for="student_13" style="cursor: pointer; display: block; font-weight: 500;">מאי&nbsp;&nbsp;קסטל</label></td>
                     <td><input type="text" class="note-input"></td>
                 </tr>
-                <!-- תלמיד 14 -->
                 <tr>
-                    <td style="text-align: center;"><input type="checkbox" id="student_14"></td>
-                    <td><label for="student_14" style="cursor: pointer; display: block; font-weight: 500;">מרי קרמובה</label></td>
+                    <td style="text-align: center;"><input type="checkbox" id="student_14" class="attendance-cb"></td>
+                    <td><label for="student_14" style="cursor: pointer; display: block; font-weight: 500;">מרי&nbsp;&nbsp;קרמובה</label></td>
                     <td><input type="text" class="note-input"></td>
                 </tr>
-                <!-- תלמיד 15 -->
                 <tr>
-                    <td style="text-align: center;"><input type="checkbox" id="student_15"></td>
-                    <td><label for="student_15" style="cursor: pointer; display: block; font-weight: 500;">אלונה רצון</label></td>
+                    <td style="text-align: center;"><input type="checkbox" id="student_15" class="attendance-cb"></td>
+                    <td><label for="student_15" style="cursor: pointer; display: block; font-weight: 500;">אלונה&nbsp;&nbsp;רצון</label></td>
                     <td><input type="text" class="note-input"></td>
                 </tr>
-                <!-- תלמיד 16 -->
                 <tr>
-                    <td style="text-align: center;"><input type="checkbox" id="student_16"></td>
-                    <td><label for="student_16" style="cursor: pointer; display: block; font-weight: 500;">מרי שובל</label></td>
+                    <td style="text-align: center;"><input type="checkbox" id="student_16" class="attendance-cb"></td>
+                    <td><label for="student_16" style="cursor: pointer; display: block; font-weight: 500;">מרי&nbsp;&nbsp;שובל</label></td>
                     <td><input type="text" class="note-input"></td>
                 </tr>
-                <!-- תלמיד 17 -->
                 <tr>
-                    <td style="text-align: center;"><input type="checkbox" id="student_17"></td>
-                    <td><label for="student_17" style="cursor: pointer; display: block; font-weight: 500;">יפתח שושן</label></td>
+                    <td style="text-align: center;"><input type="checkbox" id="student_17" class="attendance-cb"></td>
+                    <td><label for="student_17" style="cursor: pointer; display: block; font-weight: 500;">יפתח&nbsp;&nbsp;שושן</label></td>
                     <td><input type="text" class="note-input"></td>
                 </tr>
-                <!-- תלמיד 18 -->
                 <tr>
-                    <td style="text-align: center;"><input type="checkbox" id="student_18"></td>
-                    <td><label for="student_18" style="cursor: pointer; display: block; font-weight: 500;">עופרי שטרן</label></td>
+                    <td style="text-align: center;"><input type="checkbox" id="student_18" class="attendance-cb"></td>
+                    <td><label for="student_18" style="cursor: pointer; display: block; font-weight: 500;">עופרי&nbsp;&nbsp;שטרן</label></td>
                     <td><input type="text" class="note-input"></td>
                 </tr>
-                <!-- תלמיד 19 -->
                 <tr>
-                    <td style="text-align: center;"><input type="checkbox" id="student_19"></td>
-                    <td><label for="student_19" style="cursor: pointer; display: block; font-weight: 500;">אדם שפירא</label></td>
+                    <td style="text-align: center;"><input type="checkbox" id="student_19" class="attendance-cb"></td>
+                    <td><label for="student_19" style="cursor: pointer; display: block; font-weight: 500;">אדם&nbsp;&nbsp;שפירא</label></td>
                     <td><input type="text" class="note-input"></td>
                 </tr>
-                <!-- תלמיד 20 -->
                 <tr>
-                    <td style="text-align: center;"><input type="checkbox" id="student_20"></td>
-                    <td><label for="student_20" style="cursor: pointer; display: block; font-weight: 500;">תמרה שרז</label></td>
+                    <td style="text-align: center;"><input type="checkbox" id="student_20" class="attendance-cb"></td>
+                    <td><label for="student_20" style="cursor: pointer; display: block; font-weight: 500;">תמרה&nbsp;&nbsp;שרז</label></td>
                     <td><input type="text" class="note-input"></td>
                 </tr>
-                <!-- תלמיד 21 -->
                 <tr>
-                    <td style="text-align: center;"><input type="checkbox" id="student_21"></td>
-                    <td><label for="student_21" style="cursor: pointer; display: block; font-weight: 500;">ליה תומר</label></td>
+                    <td style="text-align: center;"><input type="checkbox" id="student_21" class="attendance-cb"></td>
+                    <td><label for="student_21" style="cursor: pointer; display: block; font-weight: 500;">ליה&nbsp;&nbsp;תומר</label></td>
                     <td><input type="text" class="note-input"></td>
                 </tr>
             </tbody>
         </table>
+        
+        <!-- קוביית ספירת נוכחות -->
+        <div class="summary-box">
+            סה"כ נוכחים: <span id="present-count">0</span> מתוך 21
+        </div>
     </div>
 
     <script>
-        // שמים את התאריך של היום בשדה התאריך באופן אוטומטי
+        // 1. שמים את התאריך של היום בשדה התאריך באופן אוטומטי
         document.getElementById('meetingDate').valueAsDate = new Date();
 
-        // פונקציה לייצוא ה-PDF
+        // 2. פונקציה לעדכון מונה הנוכחות
+        function updateCounter() {
+            const checkboxes = document.querySelectorAll('.attendance-cb');
+            let count = 0;
+            checkboxes.forEach(cb => {
+                if (cb.checked) count++;
+            });
+            document.getElementById('present-count').innerText = count;
+        }
+
+        // מוסיפים מאזין לכל צ'קבוקס כך שברגע שלוחצים - המונה מתעדכן
+        const allCheckboxes = document.querySelectorAll('.attendance-cb');
+        allCheckboxes.forEach(cb => {
+            cb.addEventListener('change', updateCounter);
+        });
+
+        // 3. פונקציה לייצוא ה-PDF
         function downloadPDF() {
-            // 1. מעדכן את הטקסטים שהקלידו כדי שישמרו ב-PDF
+            // מעדכן את הטקסטים שהקלידו כדי שישמרו ב-PDF
             const inputs = document.querySelectorAll('.note-input');
             inputs.forEach(input => { input.setAttribute('value', input.value); });
             
-            // 2. מסתיר את הכפתור ואזור השליטה כדי שלא יופיעו בהדפסה עצמה
-            document.getElementById('controls').style.display = 'none';
+            // מטפל בתאריך: לוקח מהשדה ומציג בכותרת ה-PDF
+            const dateInput = document.getElementById('meetingDate').value;
+            const printDateElement = document.getElementById('print-date');
+            
+            if (dateInput) {
+                // מסדר את התאריך לפורמט ישראלי (יום/חודש/שנה)
+                const parts = dateInput.split('-');
+                if(parts.length === 3) {
+                    printDateElement.innerText = 'תאריך: ' + parts[2] + '/' + parts[1] + '/' + parts[0];
+                } else {
+                    printDateElement.innerText = 'תאריך: ' + dateInput;
+                }
+            } else {
+                printDateElement.innerText = 'תאריך: לא צוין';
+            }
 
-            // 3. בוחרים את כל האזור שרוצים להדפיס
+            // מסתיר את כפתורי השליטה וחושף את הכותרת של התאריך
+            document.getElementById('controls').style.display = 'none';
+            printDateElement.style.display = 'block';
+
+            // בוחרים את כל האזור שרוצים להדפיס
             const element = document.getElementById('report-container');
             
-            // 4. הגדרות ל-PDF
-            const dateVal = document.getElementById('meetingDate').value;
+            // הגדרות ל-PDF
             const opt = {
                 margin:       10,
-                filename:     'נוכחות_משלחת_' + dateVal + '.pdf',
+                filename:     'נוכחות_משלחת_' + dateInput + '.pdf',
                 image:        { type: 'jpeg', quality: 0.98 },
                 html2canvas:  { scale: 2 },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
-            // 5. יוצרים ומורידים!
+            // יוצרים ומורידים!
             html2pdf().set(opt).from(element).save().then(() => {
-                // מחזירים את אזור הכפתורים למסך ברגע שההורדה מסתיימת
+                // לאחר ההורדה: מחזירים את אזור הכפתורים למסך ומעלימים את כותרת התאריך
                 document.getElementById('controls').style.display = 'flex';
+                printDateElement.style.display = 'none';
             });
         }
     </script>
